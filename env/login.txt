@@ -1,0 +1,46 @@
+[envs]
+13.115.123.141 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.168.226.96 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.64.63.82 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+18.179.46.245 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+18.183.228.78 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+18.179.13.58 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+52.68.209.143 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.178.10.172 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.230.89.110 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+52.192.93.186 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+52.69.188.229 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+18.181.203.22 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+3.112.215.188 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+3.113.7.165 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.95.86.26 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.230.197.100 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+52.199.195.28 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.250.152.86 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.65.152.158 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.231.129.213 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.230.81.109 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.95.146.148 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+3.112.41.91 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+18.183.90.62 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.65.163.170 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.113.227.135 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+52.68.175.121 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.230.5.184 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.199.213.238 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.115.15.202 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+3.112.150.52 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+3.112.14.101 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+[ammolite-docker]
+13.115.123.141 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.168.226.96 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+[kafka]
+52.199.195.28 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.250.152.86 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+54.65.152.158 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+13.231.129.213 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ap-northeast-1-private.pem ansible_python_interpreter=/usr/bin/python3
+[all:vars]
+host_key_checking = False
+ansible_port=22
+ansible_ssh_port=22
+forks=5

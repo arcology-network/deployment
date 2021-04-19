@@ -1,0 +1,114 @@
+---
+- hosts: kafka
+  vars: 
+  gather_facts: false
+  become: true
+  tasks: 
+  - name: install jdk
+    apt: 
+     state: latest
+     update_cache: true
+     name: '{{ item.src }}'
+     force: yes
+    with_items: 
+    - { src: 'openjdk-8-jdk' }
+- hosts: envs
+  vars: 
+  gather_facts: false
+  become: true
+  tasks: 
+  - name: chmod path 
+    file: 
+     dest: /data
+     owner: ubuntu
+     group: ubuntu
+  - name: install apts
+    apt: 
+     state: latest
+     update_cache: true
+     force: yes
+     name: 
+     - libboost-all-dev
+     - libcrypto++-dev
+     - libleveldb-dev
+     - libtbb-dev
+  - name: copy libs
+    copy: 
+     src: '{{ item.src }}'
+     dest: /usr/lib/
+    with_items: 
+    - { src: 'libs/libarbitrator.so' }
+    - { src: 'libs/libdistdb.so' }
+    - { src: 'libs/libeshing.so' }
+    - { src: 'libs/libmhasher.so' }
+  - name: debug memo
+    debug: 
+     msg: "{{ ansible_host }} install complete"
+
+- hosts: ammolite-docker
+  become: true
+  vars:
+   create_containers: 1
+   default_container_name: ammolite
+   default_container_image: cody0yang/ammolite:latest
+   default_host_path: /data/txs
+
+  tasks:
+  - name: mkdir txs 
+    file: 
+     path: "{{ default_host_path }}"
+     state: directory
+     owner: ubuntu
+     group: ubuntu
+     mode: 0775
+     recurse: yes
+  - name: Install aptitude using apt
+    apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+  - name: Install required system packages
+    apt: name={{ item }} state=latest update_cache=yes
+    loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+
+  - name: Update apt and install docker-ce
+    apt: update_cache=yes name=docker-ce state=latest
+
+  - name: Install Docker Module for Python
+    pip:
+      name: docker
+
+  - name: Pull default Docker image
+    docker_image:
+      name: "{{ default_container_image }}"
+      source: pull
+
+  # Creates the number of containers defined by the variable create_containers, using values from vars file
+  - name: Create default containers
+    docker_container:
+      name: "{{ default_container_name }}{{ item }}"
+      image: "{{ default_container_image }}"
+      command: ["/usr/sbin/sshd -D"]
+      state: started
+      recreate: yes
+      detach: true
+      tty: true
+      interactive: true
+      output_logs: yes
+      user: "root"
+      ports:
+        - "32768:22"
+      volumes:
+        - "{{ default_host_path }}:/root/data"
+    with_sequence: count={{ create_containers }}
+  - name: next step - copy data and ssh command
+    debug: 
+      msg: "scp -i {{ ansible_ssh_private_key_file }} -r ../txs {{ ansible_ssh_user }}@{{ ansible_host }}:/data ; ssh -p 32768 root@{{ ansible_host }}"

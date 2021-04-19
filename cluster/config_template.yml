@@ -1,0 +1,6 @@
+server:
+  port: 8080
+  accessTokenHash: 86b3901eea37a04e8547cd912225f548d2e0a92078887682ce831a433072f9d1
+zk:
+  servers:
+    - "zkUrl"
