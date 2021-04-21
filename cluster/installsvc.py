@@ -14,7 +14,7 @@ import requests
 import datetime
 import toml
 
-NTHREAD = 4
+TMPPATH = "/tmp"
 
 def createCoinbase(infile,outfile):
   with open(infile) as json_file:
@@ -156,13 +156,12 @@ def start_concrete_svcs(ssh_client,conn,ppstr1,ppstr2,lanes,p2p_listenaddr,debug
       ret = get_output(ssh_client, command)
       print(ret)
 
-def mergeFile(path,genesisFile):
+def mergeFile(path,monacoTmp,genesisFile):
     
   args = [path+"bins/consensus-svc", "merge"]
-  #args.append("--filea="+path+"addresses.txt")
   args.append("--filea="+genesisFile)
-  args.append("--fileb="+path+"coinbase")
-  args.append("--filec="+path+"af")
+  args.append("--fileb="+monacoTmp+"/coinbase")
+  args.append("--filec="+monacoTmp+"/af")
   result = subprocess.check_output(args, stderr=subprocess.STDOUT)
   print(result)
   
@@ -185,15 +184,15 @@ def init_ssh_clients(connection_info):
     ssh_clients[conn['name']] = client
   return ssh_clients  
 
-def do_clean(path,name,  ssh_clients):
+def do_clean(ssh_clients):
+  monacoTmp = TMPPATH+'/monaco'
+  subprocess.check_output(["rm", "-Rf", monacoTmp], stderr=subprocess.STDOUT)
 
-  subprocess.check_output(["rm", "-Rf", path+name], stderr=subprocess.STDOUT)
-  subprocess.check_output(["rm", "-Rf", path+"hpmtAccount"], stderr=subprocess.STDOUT)
-  subprocess.check_output(["rm", "-Rf", path+"hpmtStorage"], stderr=subprocess.STDOUT)
-  subprocess.check_output(["rm", "-Rf", path+"bin"], stderr=subprocess.STDOUT)
-  subprocess.check_output(["rm", "-Rf", path+"af"], stderr=subprocess.STDOUT)
-  subprocess.check_output(["rm", "-Rf", path+"config.yml"], stderr=subprocess.STDOUT)
-  subprocess.check_output(["rm", "-Rf", path+"coinbase"], stderr=subprocess.STDOUT)
+  #subprocess.check_output(["rm", "-Rf", path+name], stderr=subprocess.STDOUT)
+  #subprocess.check_output(["rm", "-Rf", path+"af"], stderr=subprocess.STDOUT)
+  #subprocess.check_output(["rm", "-Rf", path+"config.yml"], stderr=subprocess.STDOUT)
+  #subprocess.check_output(["rm", "-Rf", path+"coinbase"], stderr=subprocess.STDOUT)
+
   #for hostname, conn in connection_info.iteritems():
   for conn in connection_info:
     # remove config files if exist
@@ -211,9 +210,6 @@ def stopall(connection_info,ssh_clients):
       stop_concrete_process(ssh_clients[conn['name']],svc)
       stop_concrete_process(ssh_clients[conn['name']],svc)
 
-def clean(path,name, n, connection_info,ssh_clients):
-  do_clean(path,name, ssh_clients)
-
 
 def findSvc(svcname,conn):
   for svc in conn['svcs']:
@@ -221,9 +217,8 @@ def findSvc(svcname,conn):
       return True
   return False
 
-def deploy(path,ppstr1,ppstr2,conn,ssh_client,name,lanes,p2p_listenaddr,debugmode,basecfg):
+def deploy(path,ppstr1,ppstr2,conn,ssh_client,lanes,p2p_listenaddr,debugmode,basecfg,monacoTmp,rootdir):
 
-  rootdir = path + name
   user=conn['username']
   pwd=conn['password']
   remotepath=conn['remotepath']
@@ -231,8 +226,8 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,name,lanes,p2p_listenaddr,debugmod
 
   if findSvc('eshing-svc',conn):
     #hpmt storage
-    datadira = path + name + '/node' + str(conn['nidx']) + '/hpmtAccount'
-    datadirs = path + name + '/node' + str(conn['nidx']) + '/hpmtStorage'
+    datadira = rootdir + '/node' + str(conn['nidx']) + '/hpmtAccount'
+    datadirs = rootdir + '/node' + str(conn['nidx']) + '/hpmtStorage'
 
     result =subprocess.check_output(["mkdir", "-p","-m","777", datadira+"/db-1"], stderr=subprocess.STDOUT)
     print(result)
@@ -277,8 +272,8 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,name,lanes,p2p_listenaddr,debugmod
     print(result)
 	
     if svc=='eshing-svc':
-      datadira = path + name + '/node' + str(conn['nidx']) + '/hpmtAccount'
-      datadirs = path + name + '/node' + str(conn['nidx']) + '/hpmtStorage'
+      datadira = rootdir + '/node' + str(conn['nidx']) + '/hpmtAccount'
+      datadirs = rootdir + '/node' + str(conn['nidx']) + '/hpmtStorage'
 
       commands = scpCommands(True,conn['ispwd'],conn['password'],datadira,user+"@" + conn['ip'] + ":" + remoteBase)
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
@@ -287,11 +282,11 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,name,lanes,p2p_listenaddr,debugmod
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print(result)
     elif svc=='frontend-svc':
-      result = subprocess.check_output(["cp" , "-r", path + "config_template.yml",path + "config.yml"], stderr=subprocess.STDOUT)
+      result = subprocess.check_output(["cp" , "-r", path + "config_template.yml",monacoTmp + "/config.yml"], stderr=subprocess.STDOUT)
       print(result)
-      result = subprocess.check_output(["sed" , "-i", "s/zkUrl/"+conn['zkUrl']+"/g",path + "config.yml"], stderr=subprocess.STDOUT)
+      result = subprocess.check_output(["sed" , "-i", "s/zkUrl/"+conn['zkUrl']+"/g",monacoTmp + "/config.yml"], stderr=subprocess.STDOUT)
       print(result)
-      commands = scpCommands(False,conn['ispwd'],conn['password'],path + "config.yml",user+"@" + conn['ip'] + ":" + remoteBaseBin)
+      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/config.yml",user+"@" + conn['ip'] + ":" + remoteBaseBin)
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print(result)
     elif svc=='p2p-svc':
@@ -306,11 +301,11 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,name,lanes,p2p_listenaddr,debugmod
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print(result)
     elif svc=='feeder':
-      commands = scpCommands(False,conn['ispwd'],conn['password'],path + "af",user+"@" + conn['ip'] + ":" + remoteBase)
+      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/af",user+"@" + conn['ip'] + ":" + remoteBase)
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print(result)
     elif svc=='storage-svc':
-      commands = scpCommands(False,conn['ispwd'],conn['password'],path + "af",user+"@" + conn['ip'] + ":" + remoteBase)
+      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/af",user+"@" + conn['ip'] + ":" + remoteBase)
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print(result)      
     
@@ -325,20 +320,24 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,name,lanes,p2p_listenaddr,debugmod
 
 def create(path,name, n, mnodes, pnodes, connection_info,lanes,ssh_clients,debugmode,basecfg,genesisFile):
   # prepare config files
-  rootdir = path + name
+  monacoTmp = TMPPATH+'/monaco'
+  result =subprocess.check_output(["mkdir", "-p", monacoTmp], stderr=subprocess.STDOUT)
+  print(result)
+
+  rootdir = monacoTmp + '/' + name
   result =subprocess.check_output(["mkdir", "-p", rootdir], stderr=subprocess.STDOUT)
   print(result)
 
   result = subprocess.check_output([path +'bins/consensus-svc', 'testnet','--v='+str(n),'--o='+rootdir], stderr=subprocess.STDOUT)
   print(result)
 
-  createCoinbase(rootdir+"/node0/config/genesis.json",path+"coinbase")
+  createCoinbase(rootdir+"/node0/config/genesis.json",monacoTmp+"/coinbase")
 
   ppstr=getPeerList(rootdir+"/node0/config/config.toml")
 
   print(ppstr)
   
-  ppstr1 = ppstr #bytes.decode(ppstr)
+  ppstr1 = ppstr 
   # rewrite ppstr
   for mnode in mnodes:
     print(mnode)
@@ -346,7 +345,7 @@ def create(path,name, n, mnodes, pnodes, connection_info,lanes,ssh_clients,debug
 
   print(ppstr1)
 
-  ppstr2 = ppstr #bytes.decode(ppstr)
+  ppstr2 = ppstr 
   # rewrite ppstr
   for pnode in pnodes:
     pnode['p2p_listenaddr'] ='tcp://'+ pnode['ip'] + ':36656'
@@ -357,12 +356,12 @@ def create(path,name, n, mnodes, pnodes, connection_info,lanes,ssh_clients,debug
   ppstr2= ppstr2.replace('26656','36656')
   print(ppstr2)
   
-  result =subprocess.check_output(["mkdir", "-p", path+"/bin"], stderr=subprocess.STDOUT)
-  print(result)
+  #result =subprocess.check_output(["mkdir", "-p", path+"/bin"], stderr=subprocess.STDOUT)
+  #print(result)
 
   
   ###create genesis address file
-  mergeFile(path,genesisFile)
+  mergeFile(path,monacoTmp+'/',genesisFile)
 
   #initNums=str(int(txnums)+n)
   idx=0
@@ -375,7 +374,7 @@ def create(path,name, n, mnodes, pnodes, connection_info,lanes,ssh_clients,debug
       p2p_listenaddr=""
     print(p2p_listenaddr)
     idx=idx+1
-    t = threading.Thread(target=deploy,name=str(idx) ,args=(path,ppstr1,ppstr2,conn,ssh_client,name,lanes,p2p_listenaddr,debugmode,basecfg,))  
+    t = threading.Thread(target=deploy,name=str(idx) ,args=(path,ppstr1,ppstr2,conn,ssh_client,lanes,p2p_listenaddr,debugmode,basecfg,monacoTmp,rootdir,))  
     t.start() 
     t.join()
   
@@ -674,7 +673,7 @@ elif action == 'restart':
   genesisFile=sys.argv[4]
   
   stopall(connection_info,ssh_clients)
-  do_clean(path,name, ssh_clients)
+  do_clean(ssh_clients)
   clearkafkas(connection_info,ssh_clients)
 
 
@@ -686,5 +685,5 @@ elif action == 'stop':
 elif action == 'stopall':
   stopall(connection_info,ssh_clients)
   path = os.getcwd()+'/' 
-  do_clean(path,name, ssh_clients)
+  do_clean(ssh_clients)
   clearkafkas(connection_info,ssh_clients)

@@ -1,11 +1,17 @@
-# Network Deployment
+# Testnet Deployment
 
 ## 1. Prerequisites
 
-1. Ubuntu 20.04
-2. Python 3.x
-3. sshpass
-4. ansible
+- Ubuntu 20.04
+- Python 3.x
+- sshpass
+- ansible
+- **login.txt**
+- **testnet.json**
+
+### 1.1 Workflow
+
+![alt text](/img/install-services.svg)
 
 ## 2. Install Dependencies
 
@@ -27,16 +33,7 @@ $ ansible-playbook -i login.txt install.yml
 
 ### 2.2. On AWS
 
-Under the aws directory of the network installer directory, use genhosts.py to create the login.txt automatically.
-
-```shell
-$ python3 genhosts.py host.json ubuntu ../env/login.txt
-```
-
-| Argument         | Description   |
-| ---------------- | ------------- |
-| ubuntu           | AWS user name |
-| ../env/login.txt | output file   |
+Login.txt needs to be generated automatically with a script, refer to the [AWS](https://github.com/HPISTechnologies/aws-ansible) section for details.
 
 Under the env directory of the network installer directory, run the command below to install dependencies on the hosting machines
 
@@ -78,7 +75,7 @@ Modify testnet.json manually according to your network setup.
 Under the cluster directory of the network installer directory,run the command below to install testnet and start it.
 
 ```shell
-$ python3 svcsInstaller.py restart testnet.json 4 ../genesis_accounts_5m.txt
+$ python3 installsvc.py restart testnet.json 4 ../txs/genesis_accounts_5m.txt
 ```
 
 | Argument                   | Description                            |
@@ -86,29 +83,16 @@ $ python3 svcsInstaller.py restart testnet.json 4 ../genesis_accounts_5m.txt
 | restart                    | action type:stop/stopall/atart/restart |
 | testnet.json               | configuration file for testnet         |
 | 4                          | concurrency                            |
-| ../genesis_accounts_5m.txt | genesis account file                   |
+| ../txs/genesis_accounts_5m.txt | genesis account file                   |
 
 ### 3.2. On AWS
 
-Under the aws directory of the network installer directory,use gentestnet.py to create the testnet.json automatically.
-
-```shell
-$ python3 gentestnet.py host.json ubuntu ../cluster/testnet.json 50000 testnet 2 4 /data
-```
-
-|Argument| Description|
-|---|---|
-|ubuntu                     |aws user name|
-|../cluster/testnet.json    |output file|
-|50000                      |max txs per block|
-|2                          |number of node clusters on the testnet|
-|4                          |concurrency|
-|data                       |remote path|
+Testnet.json needs to be generated automatically with a script, refer to the [AWS](https://github.com/HPISTechnologies/aws-ansible) section for details.
 
 Under the cluster directory of the network installer directory,run the command below to install testnet and start it.
 
 ```shell
-$ python svcsInstaller.py restart testnet.json 4 ../genesis_accounts_5m.txt -sshkey
+$ python installsvc.py restart testnet.json 4 ../txs/genesis_accounts_5m.txt -sshkey
 ```
 
 | Argument                   | Description                            |
@@ -116,6 +100,6 @@ $ python svcsInstaller.py restart testnet.json 4 ../genesis_accounts_5m.txt -ssh
 | restart                    | action type:stop/stopall/atart/restart |
 | testnet.json               | configuration file for testnet         |
 | 4                          | concurrency                            |
-| ../genesis_accounts_5m.txt | genesis account file                   |
+| ../txs/genesis_accounts_5m.txt | genesis account file                   |
 | -sshkey                    | flag for aws                           |
 

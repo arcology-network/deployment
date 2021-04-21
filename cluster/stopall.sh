@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python svcsInstaller.py stopall testnet-$1.json
+python installsvc.py stopall testnet-$1.json
