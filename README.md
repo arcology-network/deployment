@@ -48,6 +48,22 @@ $ scp -i private_key_file -r ../txs root@x.x.x.x:/data
 $ ssh -p 32768 root@x.x.x.x
 ```
 
+Before executing the copy file instruction above, you can also split the data file to make it easier to send data from multiple nodes simultaneously.
+
+```shell
+$ ../tidy.sh ../txs /tmp/monacodata/output 2 1 ../txs/genesis_accounts_5m.txt
+```
+
+| Field                          | Description                             |
+| ------------------------------ | --------------------------------------- |
+| ../txs                         | Path to the original data file          |
+| /tmp/monacodata/output         | The split data path                     |
+| 2                              | Node number                             |
+| 1                              | Number of threads sending data per node |
+| ../txs/genesis_accounts_5m.txt | genesis file                            |
+
+
+
 ## 3. Starting the Network
 
 ### 3.1. On Premises

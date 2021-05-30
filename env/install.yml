@@ -17,11 +17,6 @@
   gather_facts: false
   become: true
   tasks: 
-  - name: chmod path 
-    file: 
-     dest: /data
-     owner: ubuntu
-     group: ubuntu
   - name: install apts
     apt: 
      state: latest
@@ -41,9 +36,9 @@
     - { src: 'libs/libdistdb.so' }
     - { src: 'libs/libeshing.so' }
     - { src: 'libs/libmhasher.so' }
-  - name: debug memo
+  - name: result
     debug: 
-     msg: "{{ ansible_host }} install complete"
+     msg: "{{ ansible_host }} env install complete"
 
 - hosts: ammolite-docker
   become: true
@@ -54,6 +49,11 @@
    default_host_path: /data/txs
 
   tasks:
+  - name: chmod path 
+    file: 
+     dest: /data
+     owner: ubuntu
+     group: ubuntu
   - name: mkdir txs 
     file: 
      path: '{{ item.src }}'
@@ -96,6 +96,8 @@
 
   - name: restart docker service
     shell: '{{ item }}'
+    args: 
+      warn: false
     with_items: 
     - "systemctl daemon-reload"
     - "service docker restart"
@@ -125,4 +127,4 @@
     with_sequence: count={{ create_containers }}
   - name: next step - copy data and ssh command
     debug: 
-      msg: "scp -i {{ ansible_ssh_private_key_file }} -r ../txs {{ ansible_ssh_user }}@{{ ansible_host }}:/data ; ssh -p 32768 root@{{ ansible_host }}"
+      msg: "scp -i {{ ansible_ssh_private_key_file }} -r /tmp/monacodata/node{{ node_idx }}/txs {{ ansible_ssh_user }}@{{ ansible_host }}:/data ; ssh -p 32768 root@{{ ansible_host }}"
