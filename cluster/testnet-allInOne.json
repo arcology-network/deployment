@@ -1,0 +1,23 @@
+{
+	"name":"mynet",
+	"rpm":"10000",
+	"hosts":[
+		{
+			"name":"s8",
+			"ip":"192.168.1.108",
+			"localip":"127.0.0.1",
+			"username":"s8-hpis-monaco-testnet",
+			"password":"S8@Hpis.Monaco.Testnet",
+			"mqaddr2":"127.0.0.1:9092",
+			"mqaddr":"127.0.0.1:9092",
+			"nidx":"0",
+			"nname":"node0",
+			"nthread":"4",
+			"insid":"1",
+			"zkUrl":"127.0.0.1:2181",
+			"remotepath":"/home/s8-hpis-monaco-testnet/",
+			"kafka":"true",
+			"svcs":["exec-svc","consensus-svc","arbitrator-svc","eshing-svc","generic-hashing-svc","core-svc","ppt-svc","client-svc","storage-svc","pool-svc","scheduling-svc","frontend-svc"]
+		}
+	]
+}

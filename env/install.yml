@@ -32,10 +32,12 @@
      src: '{{ item.src }}'
      dest: /usr/lib/
     with_items: 
-    - { src: 'libs/libarbitrator.so' }
-    - { src: 'libs/libdistdb.so' }
-    - { src: 'libs/libeshing.so' }
+    #- { src: 'libs/libarbitrator.so' }
+    #- { src: 'libs/libdistdb.so' }
+    #- { src: 'libs/libeshing.so' }
+    - { src: 'libs/liburlarbitrator.so' }
     - { src: 'libs/libmhasher.so' }
+    - { src: 'libs/libscheduler.so' }
   - name: result
     debug: 
      msg: "{{ ansible_host }} env install complete"

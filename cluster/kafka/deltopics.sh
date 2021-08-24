@@ -23,6 +23,7 @@ $exec --delete --zookeeper $host --topic reaping-list
 
 $exec --delete --zookeeper $host --topic euresults
 $exec --delete --zookeeper $host --topic receipts
+$exec --delete --zookeeper $host --topic access-records
 
 
 $exec --delete --zookeeper $host --topic executing-logs
@@ -32,3 +33,5 @@ $exec --delete --zookeeper $host --topic selected-txs
 $exec --delete --zookeeper $host --topic selected-msgs
 
 $exec --delete --zookeeper $host --topic spawned-relations
+
+$exec --delete --zookeeper $host --topic checked-txs

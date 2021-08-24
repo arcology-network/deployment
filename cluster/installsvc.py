@@ -96,8 +96,11 @@ def stop_concrete_process(ssh_client, name):
 
 def print_pid(result,svc,ip):
   printLog(svc +' on '+ ip +' started ',False)
-  if result[0]=='[' and result[2]==']':
-    printLog('successfully   PID ='+result[3:])
+  if result[0]=='[' and (result[2]==']' or result[3]==']'):
+    if result[2]==']':
+      printLog('successfully   PID ='+result[3:])
+    else:
+      printLog('successfully   PID ='+result[4:])
   else:
     printLog('failed Err='+result)
   
@@ -116,11 +119,6 @@ def start_concrete_svcs(ssh_client,conn,ppstr1,ppstr2,lanes,p2p_listenaddr,debug
   zkUrl=conn['zkUrl']
   localip=conn['localip']
   execAddrs=conn['execAddrs']
-  nodeKeyPath=remotepath+'svcs/config/node_key.json'
-  p2plog=remotepath+'svcs/log/p2p.log'
-
-  cfgfilea= remotepath+"svcs/hpmtAccount/config.json"
-  cfgfiles= remotepath+"svcs/hpmtStorage/config.json"
   
   outputmod=' 2>'+remotepath+'nohup.out '
   if debugmode:
@@ -129,14 +127,13 @@ def start_concrete_svcs(ssh_client,conn,ppstr1,ppstr2,lanes,p2p_listenaddr,debug
   for svc in svcs:
     if len(svc)==0:
       continue
-
+    
     if svc=='eshing-svc':
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml  --cfga='+ cfgfilea +'  --cfgs='+ cfgfiles +'  --concurrency='+ lanes + outputmod+' &'
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml  --concurrency='+ lanes + outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
     elif svc=='consensus-svc':
-      #printLog('consensus-svc delay start ...')
       logger.debug('consensus-svc delay start ...')
     elif svc=='p2p-svc':
       command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr  +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --persistent_peers=' + ppstr2 + '  --laddr='+ p2p_listenaddr + ' --node_key='+ nodeKeyPath + outputmod+' &' 
@@ -144,7 +141,7 @@ def start_concrete_svcs(ssh_client,conn,ppstr1,ppstr2,lanes,p2p_listenaddr,debug
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
     elif svc=='storage-svc':
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --zkUrl='+ zkUrl +' --localIp='+ localip +' --logcfg='+ remotepath +'svcs/bin/log.toml --af='+ remotepath +'svcs/af  --cacheSizeMax=20 --concurrency='+ lanes + outputmod+' &'
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --zkUrl='+ zkUrl +' --localIp='+ localip +' --logcfg='+ remotepath +'svcs/bin/log.toml --af='+ remotepath +'svcs/af  --concurrency='+ lanes + outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
@@ -154,17 +151,17 @@ def start_concrete_svcs(ssh_client,conn,ppstr1,ppstr2,lanes,p2p_listenaddr,debug
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
     elif svc=='exec-svc':
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --localIp='+localip+' --logcfg='+ remotepath +'svcs/bin/log.toml --nthread='+ nthread +' --insid='+ insid +' --execlog=true --concurrency='+ lanes + outputmod+' &'
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --localIp='+localip+' --logcfg='+ remotepath +'svcs/bin/log.toml --insid='+ insid +' --nthread='+ nthread +' --execlog=true --concurrency='+ lanes + outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
     elif svc=='scheduling-svc' :
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --batchs=2000 --zkUrl='+zkUrl+' --localIp='+ localip +' --execAddrs='+execAddrs+'  --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + ' ' +outputmod+' &'
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --batchs=500 --zkUrl='+zkUrl+' --localIp='+ localip +' --execAddrs='+execAddrs+' --conflictfile='+ remotepath +'svcs/bin/conflictlist  --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + ' ' +outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
     elif svc=='pool-svc' :
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + ' --waits=3600 --rpm='+ rpm +outputmod+' &'
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + ' --rpm='+ rpm +outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
@@ -173,13 +170,13 @@ def start_concrete_svcs(ssh_client,conn,ppstr1,ppstr2,lanes,p2p_listenaddr,debug
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
-    elif svc=='client-svc' :
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --zkUrl='+ zkUrl +' --localIp='+ localip +' --insid='+ insid +' --txnums=1000 --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + outputmod+' &'
+    elif svc=='gateway-svc' :
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --zkUrl='+ zkUrl +' --localIp='+ localip +' --waits=3600  --txnums=1000 --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
     elif svc=='ppt-svc' :
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --waits=3600 --concurrency='+ lanes + outputmod+' &'
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
@@ -275,27 +272,6 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,lanes,p2p_listenaddr,debugmode,bas
   pwd=conn['password']
   remotepath=conn['remotepath']
   
-
-  if findSvc('eshing-svc',conn):
-    #hpmt storage
-    datadira = rootdir + '/node' + str(conn['nidx']) + '/hpmtAccount'
-    datadirs = rootdir + '/node' + str(conn['nidx']) + '/hpmtStorage'
-
-    result =subprocess.check_output(["mkdir", "-p","-m","777", datadira+"/db-1"], stderr=subprocess.STDOUT)
-    print_output(result)
-    result =subprocess.check_output(["mkdir", "-p","-m","777", datadirs+"/db-1"], stderr=subprocess.STDOUT)
-    print_output(result)
-
-    shutil.copyfile( path + "config.json", datadira + "/config.json")
-    shutil.copyfile( path + "shard-1.json", datadira + "/shard-1.json")
-    file_replace(datadira + "/config.json","sharePath",remotepath+"svcs/hpmtAccount/shard-1.json")
-    file_replace(datadira + "/shard-1.json","dbPathContext",remotepath+"svcs/hpmtAccount/db-1/lvdb_")
-
-    shutil.copyfile( path + "config.json", datadirs + "/config.json")
-    shutil.copyfile( path + "shard-1.json", datadirs + "/shard-1.json")
-    file_replace(datadirs + "/config.json","sharePath",remotepath+"svcs/hpmtStorage/shard-1.json")
-    file_replace(datadirs + "/shard-1.json","dbPathContext",remotepath+"svcs/hpmtStorage/db-1/lvdb_")
-
   remoteBase=remotepath+'svcs'
   command = 'mkdir -p '+remoteBase
   ret = get_output(ssh_client, command)
@@ -322,17 +298,7 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,lanes,p2p_listenaddr,debugmode,bas
     result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
     print_output(result)
 	
-    if svc=='eshing-svc':
-      datadira = rootdir + '/node' + str(conn['nidx']) + '/hpmtAccount'
-      datadirs = rootdir + '/node' + str(conn['nidx']) + '/hpmtStorage'
-
-      commands = scpCommands(True,conn['ispwd'],conn['password'],datadira,user+"@" + conn['ip'] + ":" + remoteBase)
-      result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
-      print_output(result)
-      commands = scpCommands(True,conn['ispwd'],conn['password'],datadirs,user+"@" + conn['ip'] + ":" + remoteBase)
-      result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
-      print_output(result)
-    elif svc=='frontend-svc':
+    if svc=='frontend-svc':
       result = subprocess.check_output(["cp" , "-r", path + "config_template.yml",monacoTmp + "/config.yml"], stderr=subprocess.STDOUT)
       print_output(result)
       result = subprocess.check_output(["sed" , "-i", "s/zkUrl/"+conn['zkUrl']+"/g",monacoTmp + "/config.yml"], stderr=subprocess.STDOUT)
@@ -351,23 +317,21 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,lanes,p2p_listenaddr,debugmode,bas
       commands = scpCommands(True,conn['ispwd'],conn['password'],rootdir + "/node" + str(conn['nidx']+"/data"),user+"@" + conn['ip'] + ":" + remoteBase)
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print_output(result)
-    elif svc=='feeder':
-      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/af",user+"@" + conn['ip'] + ":" + remoteBase)
-      result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
-      print_output(result)
     elif svc=='storage-svc':
       commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/af",user+"@" + conn['ip'] + ":" + remoteBase)
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
-      print_output(result) 
-    
+      print_output(result)
+    elif svc=='scheduling-svc':
+      commands = scpCommands(False,conn['ispwd'],conn['password'],path + "conflictlist",user+"@" + conn['ip'] + ":" + remoteBaseBin)
+      result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
+      print_output(result)  
+
     
   if len(conn['svcs'])==0:
     return
 
   start_concrete_svcs(ssh_client, conn, ppstr1,ppstr2,lanes,p2p_listenaddr,debugmode,basecfg)
 
-  #printLog(','.join(conn['svcs'])+ ' in ' + conn['ip'] + '  installed  ')
-  #printLog('')
   return
 
 def create(path,name, n, mnodes, pnodes, connection_info,lanes,ssh_clients,debugmode,basecfg,genesisFile):
@@ -515,7 +479,9 @@ def startConsensus(ssh_client,conn,ppstr1,lanes,debugmode,startTime):
   if debugmode:
     outputmod=' >'+remotepath+'nohup.out 2>&1'
 
-  command = remotepath +'svcs/bin/starter '+ startTime +' nohup '+ remotepath +'svcs/bin/consensus-svc start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --instrumentation.prometheus=true --instrumentation.prometheus_listen_addr=:19001  --p2p.persistent_peers=\'' + ppstr1 + '\'' +' --concurrency='+ lanes + outputmod+' &'
+  command =' nohup '+ remotepath +'svcs/bin/starter '+ startTime +' nohup '+ remotepath +'svcs/bin/consensus-svc start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --instrumentation.prometheus=true --instrumentation.prometheus_listen_addr=:19001  --p2p.persistent_peers=\'' + ppstr1 + '\'' +' --concurrency='+ lanes + outputmod+' &'
+  #command = ' nohup '+ remotepath +'svcs/bin/consensus-svc start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --logcfg='+ remotepath +'svcs/bin/log.toml --instrumentation.prometheus=true --instrumentation.prometheus_listen_addr=:19001  --p2p.persistent_peers=\'' + ppstr1 + '\'' +' --concurrency='+ lanes + outputmod+' &'
+
   logger.debug(command)
   ret = get_output(ssh_client, command)
   print_pid(ret,'consensus-svc',conn['ip'])

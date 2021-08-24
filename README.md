@@ -33,7 +33,7 @@ $ ansible-playbook -i login.txt install.yml
 
 ### 2.2. On AWS
 
-Login.txt needs to be generated automatically with a script, refer to the [AWS](https://github.com/HPISTechnologies/aws-ansible) section for details.
+Login.txt needs to be generated automatically with a script, refer to the [AWS](https://github.com/arcology/aws-ansible) section for details.
 
 Under the env directory of the network installer directory, run the command below to install dependencies on the hosting machines
 
@@ -103,7 +103,7 @@ $ python3 installsvc.py restart testnet.json 4 ../txs/genesis_accounts_5m.txt
 
 ### 3.2. On AWS
 
-Testnet.json needs to be generated automatically with a script, refer to the [AWS](https://github.com/HPISTechnologies/aws-ansible) section for details.
+Testnet.json needs to be generated automatically with a script, refer to the [AWS](https://github.com/arcology/aws-ansible) section for details.
 
 Under the cluster directory of the network installer directory,run the command below to install testnet and start it.
 

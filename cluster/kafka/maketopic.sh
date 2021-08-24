@@ -9,9 +9,9 @@ host=localhost:2181
 
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic msgexch
 
-$exec --create --zookeeper $host --replication-factor 1 --partitions 3 --topic local-txs
-$exec --create --zookeeper $host --replication-factor 1 --partitions 3 --topic remote-txs
-$exec --create --zookeeper $host --replication-factor 1 --partitions 3 --topic block-txs
+$exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic local-txs
+$exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic remote-txs
+$exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic block-txs
 
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic chkd-message
 
@@ -24,6 +24,7 @@ $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic r
 
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic euresults
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic receipts
+$exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic access-records
 
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic executing-logs
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic meta-block
@@ -32,3 +33,5 @@ $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic s
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic selected-msgs
 
 $exec --create --zookeeper $host --replication-factor 1 --partitions 1 --topic spawned-relations
+
+$exec --create --zookeeper $host --replication-factor 1 --partitions $1 --topic checked-txs
