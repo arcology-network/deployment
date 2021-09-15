@@ -1,0 +1,24 @@
+{
+	"name":"mynet",
+	"rpm":"20",
+	"hosts":[
+		{
+			"name":"s9",
+			"ip":"hostip",
+			"port":"22",
+			"localip":"127.0.0.1",
+			"username":"hostusername",
+			"password":"hostuserpwd",
+			"mqaddr2":"127.0.0.1:9092",
+			"mqaddr":"127.0.0.1:9092",
+			"nidx":"0",
+			"nname":"node0",
+			"nthread":"4",
+			"insid":"1",
+			"zkUrl":"127.0.0.1:2181",
+			"remotepath":"hostpath",
+			"kafka":"true",
+			"svcs":["exec-svc","consensus-svc","arbitrator-svc","eshing-svc","generic-hashing-svc","core-svc","ppt-svc","gateway-svc","storage-svc","pool-svc","scheduling-svc","frontend-svc"]
+		}
+	]
+}

@@ -48,25 +48,24 @@
    create_containers: 1
    default_container_name: ammolite
    default_container_image: cody0yang/ammolite:latest
-   default_host_path: /data/txs
-
+   default_host_path: '{{ base_path }}txs'
   tasks:
   - name: chmod path 
     file: 
-     dest: /data
-     owner: ubuntu
-     group: ubuntu
+     dest: '{{ base_path }}'
+     owner: '{{ ansible_ssh_user }}'
+     group: '{{ ansible_ssh_user }}'
   - name: mkdir txs 
     file: 
      path: '{{ item.src }}'
      state: directory
-     owner: ubuntu
-     group: ubuntu
+     owner: '{{ ansible_ssh_user }}'
+     group: '{{ ansible_ssh_user }}'
      mode: 0775
      recurse: yes
     with_items: 
-    - { src: '/data/txs' }
-    - { src: '/data/docker' }
+    - { src: '{{ base_path }}txs' }
+    - { src: '{{ base_path }}docker' }
   - name: copy docker service config
     copy: 
      src: 'docker-overlay.conf'
@@ -129,4 +128,4 @@
     with_sequence: count={{ create_containers }}
   - name: next step - copy data and ssh command
     debug: 
-      msg: "scp -i {{ ansible_ssh_private_key_file }} -r /tmp/monacodata/node{{ node_idx }}/txs {{ ansible_ssh_user }}@{{ ansible_host }}:/data ; ssh -p 32768 root@{{ ansible_host }}"
+      msg: "scp -r ../txs {{ ansible_ssh_user }}@{{ ansible_host }}:{{ base_path }} ; ssh -p 32768 root@{{ ansible_host }}"

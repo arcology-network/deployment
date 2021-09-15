@@ -1,0 +1,11 @@
+[envs]
+hostip ansible_ssh_user=hostusername ansible_ssh_pass=hostuserpwd ansible_become_pass=hostuserpwd
+[ammolite-docker]
+hostip ansible_ssh_user=hostusername ansible_ssh_pass=hostuserpwd ansible_become_pass=hostuserpwd base_path=hostpath
+[kafka]
+hostip ansible_ssh_user=hostusername ansible_ssh_pass=hostuserpwd ansible_become_pass=hostuserpwd
+[all:vars]
+host_key_checking = False
+ansible_port=22
+ansible_ssh_port=22
+forks=5

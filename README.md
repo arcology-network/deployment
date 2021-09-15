@@ -33,7 +33,7 @@ $ ansible-playbook -i login.txt install.yml
 
 ### 2.2. On AWS
 
-Login.txt needs to be generated automatically with a script, refer to the [AWS](https://github.com/arcology/aws-ansible) section for details.
+Login.txt needs to be generated automatically with a script, refer to the [AWS](https://github.com/arcology-network/aws-ansible) section for details.
 
 Under the env directory of the network installer directory, run the command below to install dependencies on the hosting machines
 
@@ -91,29 +91,29 @@ Modify testnet.json manually according to your network setup.
 Under the cluster directory of the network installer directory,run the command below to install testnet and start it.
 
 ```shell
-$ python3 installsvc.py restart testnet.json 4 ../txs/genesis_accounts_5m.txt
+$ ./install.sh startall testnet.json 4 ../txs/genesis_accounts_5m.txt
 ```
 
 | Argument                   | Description                            |
 | -------------------------- | -------------------------------------- |
-| restart                    | action type:stop/stopall/atart/restart |
+| restart                    | action type:setup/start/startall/stopall|
 | testnet.json               | configuration file for testnet         |
 | 4                          | concurrency                            |
 | ../txs/genesis_accounts_5m.txt | genesis account file                   |
 
 ### 3.2. On AWS
 
-Testnet.json needs to be generated automatically with a script, refer to the [AWS](https://github.com/arcology/aws-ansible) section for details.
+Testnet.json needs to be generated automatically with a script, refer to the [AWS](https://github.com/arcology-network/aws-ansible) section for details.
 
 Under the cluster directory of the network installer directory,run the command below to install testnet and start it.
 
 ```shell
-$ python installsvc.py restart testnet.json 4 ../txs/genesis_accounts_5m.txt -sshkey
+$ ./install.sh startall testnet.json 4 ../txs/genesis_accounts_5m.txt -sshkey
 ```
 
 | Argument                   | Description                            |
 | -------------------------- | -------------------------------------- |
-| restart                    | action type:stop/stopall/atart/restart |
+| restart                    | action type:setup/start/startall/stopall |
 | testnet.json               | configuration file for testnet         |
 | 4                          | concurrency                            |
 | ../txs/genesis_accounts_5m.txt | genesis account file                   |

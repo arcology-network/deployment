@@ -156,7 +156,7 @@ def start_concrete_svcs(ssh_client,conn,ppstr1,ppstr2,lanes,p2p_listenaddr,debug
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
     elif svc=='scheduling-svc' :
-      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --batchs=500 --zkUrl='+zkUrl+' --localIp='+ localip +' --execAddrs='+execAddrs+' --conflictfile='+ remotepath +'svcs/bin/conflictlist  --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + ' ' +outputmod+' &'
+      command = 'nohup '+ remotepath +'svcs/bin/'+svc+' start --home='+ remotepath +'svcs --mqaddr='+ mqaddr +' --mqaddr2='+ mqaddr2 +' --nidx='+ nidx +' --nname='+ nname +' --batchs=500 --zkUrl='+zkUrl+' --localIp='+ localip +' --execAddrs='+execAddrs+' --nthread='+ nthread +' --conflictfile='+ remotepath +'svcs/bin/conflictlist  --logcfg='+ remotepath +'svcs/bin/log.toml --concurrency='+ lanes + ' ' +outputmod+' &'
       logger.debug(command)
       ret = get_output(ssh_client, command)
       print_pid(ret,svc,conn['ip'])
@@ -218,13 +218,13 @@ def init_ssh_clients(connection_info):
 
     printLog('Try to connect to host '+ conn['ip'] +' through ssh ... ',False)
     if conn['ispwd']:
-      if not client.login(conn['ip'], conn['username'], conn['password']):
+      if not client.login(conn['ip'], conn['username'], conn['password'], port=int(conn['port'])):
         printLog('Failed')
         exit(1)
       else:
         printLog('Established')
     else:
-      if not client.login(conn['ip'], conn['username'], ssh_key=str(conn['password'])):
+      if not client.login(conn['ip'], conn['username'], ssh_key=str(conn['password']), port=int(conn['port'])):
         printLog('Failed')
         exit(1)
       else:
@@ -233,7 +233,7 @@ def init_ssh_clients(connection_info):
     ssh_clients[conn['name']] = client
   return ssh_clients  
 
-def do_clean(ssh_clients):
+def do_clean(connection_info,ssh_clients):
   printSection('Clear History Temp Files')
 
   monacoTmp = TMPPATH+'/monaco'
@@ -282,19 +282,19 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,lanes,p2p_listenaddr,debugmode,bas
   ret = get_output(ssh_client, command)
   
 
-  commands = scpCommands(False,conn['ispwd'],conn['password'],path + "log.toml",user+"@" + conn['ip'] + ":" + remoteBaseBin)
+  commands = scpCommands(False,conn['ispwd'],conn['password'],path + "log.toml",user+"@" + conn['ip'] + ":" + remoteBaseBin, conn['port'])
   result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
   print_output(result)
   
   #copy starter
-  commands = scpCommands(False,conn['ispwd'],conn['password'],path + "bins/starter",user+"@" + conn['ip'] + ":" + remoteBaseBin)
+  commands = scpCommands(False,conn['ispwd'],conn['password'],path + "bins/starter",user+"@" + conn['ip'] + ":" + remoteBaseBin, conn['port'])
   result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
   print_output(result)
 
   for svc in conn['svcs']:
     if len(svc)==0:
       continue
-    commands = scpCommands(False,conn['ispwd'],conn['password'],path + "bins/"+svc,user+"@" + conn['ip'] + ":" + remoteBaseBin)
+    commands = scpCommands(False,conn['ispwd'],conn['password'],path + "bins/"+svc,user+"@" + conn['ip'] + ":" + remoteBaseBin, conn['port'])
     result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
     print_output(result)
 	
@@ -303,26 +303,26 @@ def deploy(path,ppstr1,ppstr2,conn,ssh_client,lanes,p2p_listenaddr,debugmode,bas
       print_output(result)
       result = subprocess.check_output(["sed" , "-i", "s/zkUrl/"+conn['zkUrl']+"/g",monacoTmp + "/config.yml"], stderr=subprocess.STDOUT)
       print_output(result)
-      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/config.yml",user+"@" + conn['ip'] + ":" + remoteBaseBin)
+      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/config.yml",user+"@" + conn['ip'] + ":" + remoteBaseBin, conn['port'])
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print_output(result)
     elif svc=='p2p-svc':
-      commands = scpCommands(True,conn['ispwd'],conn['password'],rootdir + "/node" + str(conn['nidx']+"/config"),user+"@" + conn['ip'] + ":" + remoteBase)
+      commands = scpCommands(True,conn['ispwd'],conn['password'],rootdir + "/node" + str(conn['nidx']+"/config"),user+"@" + conn['ip'] + ":" + remoteBase, conn['port'])
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print_output(result)
     elif svc=='consensus-svc':
-      commands = scpCommands(True,conn['ispwd'],conn['password'],rootdir + "/node" + str(conn['nidx']+"/config"),user+"@" + conn['ip'] + ":" + remoteBase)
+      commands = scpCommands(True,conn['ispwd'],conn['password'],rootdir + "/node" + str(conn['nidx']+"/config"),user+"@" + conn['ip'] + ":" + remoteBase, conn['port'])
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print_output(result)
-      commands = scpCommands(True,conn['ispwd'],conn['password'],rootdir + "/node" + str(conn['nidx']+"/data"),user+"@" + conn['ip'] + ":" + remoteBase)
+      commands = scpCommands(True,conn['ispwd'],conn['password'],rootdir + "/node" + str(conn['nidx']+"/data"),user+"@" + conn['ip'] + ":" + remoteBase, conn['port'])
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print_output(result)
     elif svc=='storage-svc':
-      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/af",user+"@" + conn['ip'] + ":" + remoteBase)
+      commands = scpCommands(False,conn['ispwd'],conn['password'],monacoTmp + "/af",user+"@" + conn['ip'] + ":" + remoteBase, conn['port'])
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print_output(result)
     elif svc=='scheduling-svc':
-      commands = scpCommands(False,conn['ispwd'],conn['password'],path + "conflictlist",user+"@" + conn['ip'] + ":" + remoteBaseBin)
+      commands = scpCommands(False,conn['ispwd'],conn['password'],path + "conflictlist",user+"@" + conn['ip'] + ":" + remoteBaseBin, conn['port'])
       result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
       print_output(result)  
 
@@ -502,15 +502,19 @@ def setupkafkas(path, connection_info,ssh_clients):
     thread.start() 
     thread.join()
     
-def scpCommands(copyDirector,isPwd,pwd,local,remote):
+def scpCommands(copyDirector,isPwd,pwd,local,remote,port):
     commands = []
     if isPwd:
       commands.append("sshpass")
       commands.append("-p")
       commands.append(pwd)
       commands.append("scp")
+      commands.append("-P")
+      commands.append(port)
     else:
       commands.append("scp")
+      commands.append("-P")
+      commands.append(port)
       commands.append("-i")
       commands.append(str(pwd))
     
@@ -529,7 +533,7 @@ def setupkafka(path,conn,ssh_client):
   
   localdir = path + 'kafka'
 
-  commands = scpCommands(True,conn['ispwd'],conn['password'],localdir,conn['username']+"@" + conn['ip'] + ":" + conn['remotepath'])
+  commands = scpCommands(True,conn['ispwd'],conn['password'],localdir,conn['username']+"@" + conn['ip'] + ":" + conn['remotepath'], conn['port'])
   result = subprocess.check_output(commands, stderr=subprocess.STDOUT)
   print_output(result)
 
@@ -639,6 +643,7 @@ with open(filename) as config_file:
     ci = {}
     ci['name'] = host['name']
     ci['ip'] = host['ip']
+    ci['port'] = host['port']
     ci['localip'] = host['localip']
     ci['username'] = host['username']
     ci['password'] = host['password']
